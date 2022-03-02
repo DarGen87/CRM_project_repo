@@ -7,7 +7,7 @@ from optparse import Values
 from tkinter import *
 from tkinter import ttk
 from turtle import width
-#from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 import sqlite3
 
 ########################## GUI SetUp ############################################
@@ -56,11 +56,8 @@ c = conn.cursor()
 
 
 # Create Table Kinder
-
-#PRAGMA foreign_keys;
-
-c.execute("""CREATE TABLE IF NOT EXISTS kinder (
-    id_k integer PRIMARY KEY, 
+c.execute("""CREATE TABLE IF NOT EXISTS kinder ( 
+    id_k integer PRIMARY KEY,
     vorname text, 
     nachname text, 
     alt integer,
@@ -71,15 +68,24 @@ c.execute("""CREATE TABLE IF NOT EXISTS kinder (
     plz text,
     kontaktperson text,
     gruppe_id integer,
-
-    FOREIGN KEY(id_g) 
+    person_id integer,  
+    FOREIGN KEY(gruppe_id) 
         REFERENCES gruppe (id_g),
-    FOREIGN KEY(id_p) 
+    FOREIGN KEY(person_id) 
         REFERENCES person_k (id_p)
-
     )""")
-  
 
+# Create Table gruppe
+c.execute("""CREATE TABLE IF NOT EXISTS gruppe (
+    id_g integer PRIMARY KEY,
+    gruppenname text,
+    kinder_id integer,
+    erzieher_id integer,   
+    FOREIGN KEY(kinder_id) 
+        REFERENCES person_k (id_k),
+    FOREIGN KEY(erzieher_id) 
+        REFERENCES person_k (id_e)
+    )""")
 
 # Create Table person_k
 c.execute("""CREATE TABLE IF NOT EXISTS person_k (
@@ -91,13 +97,14 @@ c.execute("""CREATE TABLE IF NOT EXISTS person_k (
     h_nummer integer, 
     stadt text,
     plz text,
-    verwandschaft text
+    verwandschaft text,
+    kinder_id integer,
+    FOREIGN KEY(kinder_id) 
+        REFERENCES person_k (id_k),
     )""")
-   
-'''
-# Create Table erzieher
+
 c.execute("""CREATE TABLE IF NOT EXISTS erzieher (
-    id_e integer, PK
+    id_e integer PRIMARY KEY, 
     vornname text, 
     nachname text, 
     alt integer,
@@ -105,19 +112,14 @@ c.execute("""CREATE TABLE IF NOT EXISTS erzieher (
     h_nummer integer, 
     stadt text,
     plz text,
-    id_k integer FK 1.. to 1..many
-    id_g integer FK 1..many to 1..many
+    kinder_id integer,
+    gruppe_id integer,
+    FOREIGN KEY(kinder_id) 
+        REFERENCES person_k (id_k),
+    FOREIGN KEY(gruppe_id) 
+        REFERENCES gruppe (id_g),
     )""")
-'''    
-'''
-# Create Table gruppe
-c.execute("""CREATE TABLE IF NOT EXISTS gruppe (
-    id_g integer, PK
-    gruppenname text, 
-    id_k integer FK, 1..many to 1
-    id_e integer FK
-    )""")
-'''     
+
 
 # Add Dummy Data
 """
@@ -157,6 +159,9 @@ def query_database():
     # Add Data to the Screen
     global count
     count = 0
+
+    for record in records:
+        print(record)
 
     for record in records:
         if count % 2 == 0:
@@ -350,6 +355,14 @@ def update_record():
     # Update Record
     my_tree.item(selected, text="", values= (id_entry.get(), rolle_entry.get(), name_entry.get(), nachname_entry.get(), addresse_entry.get(), stadt_entry.get(), plz_entry.get(),))
 
+    # DB Connection
+
+    # cursor Instance
+    c.execute("""UPDATE kinder SET
+
+    """)
+
+
     # Clear entry Boxes
     id_entry.delete(0, END)
     rolle_entry.delete(0, END)
@@ -407,7 +420,6 @@ plt.show()
 """
 
 # Run to pull data from database on start
-
 query_database()
 
 app.mainloop()
