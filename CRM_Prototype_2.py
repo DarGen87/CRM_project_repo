@@ -1,2 +1,4 @@
 t root
-from operator import
+from operator importkjkljkjl
+khhjhkj
+hjjhjh
