@@ -7,7 +7,6 @@ from optparse import Values
 from tkinter import *
 from tkinter import ttk
 from turtle import width
-from matplotlib import pyplot as plt
 import sqlite3
 
 ########################## GUI SetUp ############################################
@@ -45,7 +44,21 @@ data = [[1,"example", "example", "example", "example", "example", 1],
         [23,"example", "example", "example", "example", "example", 1],
         [24,"example", "example", "example", "example", "example", 1]]
 """
-
+# Add Dummy Data
+"""
+for record in data:
+    c.execute("INSERT INTO kinder VALUES(:id, :rolle, :name, :nachname, :addresse, :stadt, :plz)",
+        {
+        'id': record[0],     
+        'rolle': record[1],
+        'name': record[2],
+        'nachname': record[3],
+        'addresse': record[4],
+        'stadt': record[5],
+        'plz': record[6]
+        }
+    )
+"""
 # Create/Connect to a database 
 conn = sqlite3.connect('crm.db')
 
@@ -54,6 +67,17 @@ c = conn.cursor()
 
 # Tables
 
+# Create Table Base (Pivot)
+c.execute("""CREATE TABLE IF NOT EXISTS base(
+    id_k integer,
+    vorname text, 
+    nachname text, 
+    alt integer,
+    strasse text,
+    h_nummer integer, 
+    stadt text,
+    plz text
+    )""")
 
 # Create Table Kinder
 c.execute("""CREATE TABLE IF NOT EXISTS kinder ( 
@@ -100,9 +124,10 @@ c.execute("""CREATE TABLE IF NOT EXISTS person_k (
     verwandschaft text,
     kinder_id integer,
     FOREIGN KEY(kinder_id) 
-        REFERENCES person_k (id_k),
+        REFERENCES person_k (id_k)
     )""")
 
+# Create Table erzieher
 c.execute("""CREATE TABLE IF NOT EXISTS erzieher (
     id_e integer PRIMARY KEY, 
     vornname text, 
@@ -117,25 +142,8 @@ c.execute("""CREATE TABLE IF NOT EXISTS erzieher (
     FOREIGN KEY(kinder_id) 
         REFERENCES person_k (id_k),
     FOREIGN KEY(gruppe_id) 
-        REFERENCES gruppe (id_g),
+        REFERENCES gruppe (id_g)
     )""")
-
-
-# Add Dummy Data
-"""
-for record in data:
-    c.execute("INSERT INTO kinder VALUES(:id, :rolle, :name, :nachname, :addresse, :stadt, :plz)",
-        {
-        'id': record[0],     
-        'rolle': record[1],
-        'name': record[2],
-        'nachname': record[3],
-        'addresse': record[4],
-        'stadt': record[5],
-        'plz': record[6]
-        }
-    )
-"""
 
 # Commit Changes
 conn.commit()
@@ -144,7 +152,6 @@ conn.commit()
 conn.close()
 
 # Query DB
-
 def query_database():
 
     # Create/Connect to a database 
@@ -153,7 +160,7 @@ def query_database():
     # Create Cursor Instance 
     c = conn.cursor()
 
-    c.execute("SELECT * FROM kinder")
+    c.execute("SELECT * FROM base")
     records = c.fetchall()
 
     # Add Data to the Screen
@@ -237,7 +244,7 @@ my_tree.heading("3",text="Nachname",anchor=CENTER)
 my_tree.heading("4",text="Addresse", anchor=CENTER)
 my_tree.heading("5",text="Stadt",anchor=CENTER)
 my_tree.heading("6",text="PLZ", anchor=CENTER)
-my_tree.heading("7",text="Rolle", anchor=CENTER)
+my_tree.heading("7",text="Person", anchor=CENTER)
 
 ########################## Label/Entries GUI SetUp #################################
 
@@ -357,12 +364,6 @@ def update_record():
 
     # DB Connection
 
-    # cursor Instance
-    c.execute("""UPDATE kinder SET
-
-    """)
-
-
     # Clear entry Boxes
     id_entry.delete(0, END)
     rolle_entry.delete(0, END)
@@ -406,18 +407,6 @@ select_record_button.grid(row=0, column=7, padx=10, pady=10)
 
 # Bind the Treeview
 my_tree.bind("<ButtonRelease-1>", select_record)
-
-# Plot The Datas 
-
-"""
-plot_x = [1,2,3,4,5,6]
-
-plot_y = [10,20,30,40,50,60]
-
-plt.plot(plot_x, plot_y)
-plt.show()
-
-"""
 
 # Run to pull data from database on start
 query_database()
