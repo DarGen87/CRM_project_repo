@@ -7,143 +7,94 @@ from optparse import Values
 from tkinter import *
 from tkinter import ttk
 from turtle import width
+from tkinter import messagebox
 import sqlite3
+from click import command, option
+from numpy import append
+from tkinter import colorchooser
 
 ########################## GUI SetUp ############################################
 
 app = Tk()
 app.title('CRM')
-app.geometry("1050x600")
+app.geometry("1600x600")
+"""
+def primary_color():
+    pass
+
+def secondary_color():
+    pass
+
+def highlite_color():
+    pass
+
+# Add Menu
+my_menu = Menu(app)
+app.config(menu=my_menu)
+
+# config Menu
+option_menu = Menu(my_menu, tearoff=0)
+my_menu.add_cascade(Label="Options", menu = option_menu)
+
+option_menu.add_command(Label="Change Primary Color", command=primary_color)
+option_menu.add_command(Label="Change Secondary Color", command=secondary_color)
+option_menu.add_command(Label="Change Higlight Color", command=highlite_color)
+option_menu.add_separator()
+option_menu.add_command(Label="Exit", command=app.quit)
+"""
 
 ######################### DB Setup ##############################################
 
+######### Label QueryCommands ###########
+#def search_record():
+
 # DB Datas
+
+# FakeData example lists
 """
-data = [[1,"example", "example", "example", "example", "example", 1], 
-        [2,"example", "example", "example", "example", "example", 1],
-        [3,"example", "example", "example", "example", "example", 1],
-        [4,"example", "example", "example", "example", "example", 1],
-        [5,"example", "example", "example", "example", "example", 1],
-        [6,"example", "example", "example", "example", "example", 1],
-        [7,"example", "example", "example", "example", "example", 1], 
-        [8,"example", "example", "example", "example", "example", 1],
-        [9,"example", "example", "example", "example", "example", 1],
-        [10,"example", "example", "example", "example", "example", 1],
-        [11,"example", "example", "example", "example", "example", 1],
-        [12,"example", "example", "example", "example", "example", 1],
-        [13,"example", "example", "example", "example", "example", 1], 
-        [14,"example", "example", "example", "example", "example", 1],
-        [15,"example", "example", "example", "example", "example", 1],
-        [16,"example", "example", "example", "example", "example", 1],
-        [17,"example", "example", "example", "example", "example", 1],
-        [18,"example", "example", "example", "example", "example", 1],
-        [19,"example", "example", "example", "example", "example", 1], 
-        [20,"example", "example", "example", "example", "example", 1],
-        [21,"example", "example", "example", "example", "example", 1],
-        [22,"example", "example", "example", "example", "example", 1],
-        [23,"example", "example", "example", "example", "example", 1],
-        [24,"example", "example", "example", "example", "example", 1]]
+data = [[1,"vorname", "nachname", 34, "strasse", 10, "stadt", "PLZ", "Dario"], 
+        [2,"vorname", "nachname", 34, "strasse", 20, "stadt", "PLZ", "Dieu"],
+        [3,"vorname", "nachname", 34, "strasse", 20, "stadt", "PLZ", "Muhannad"],
+        [4,"vorname", "nachname", 34, "strasse", 20, "stadt", "PLZ", "David"],
+        [5,"vorname", "nachname", 34, "strasse", 20, "stadt", "PLZ", "Ehab"]]
 """
-# Add Dummy Data
-"""
-for record in data:
-    c.execute("INSERT INTO kinder VALUES(:id, :rolle, :name, :nachname, :addresse, :stadt, :plz)",
-        {
-        'id': record[0],     
-        'rolle': record[1],
-        'name': record[2],
-        'nachname': record[3],
-        'addresse': record[4],
-        'stadt': record[5],
-        'plz': record[6]
-        }
-    )
-"""
+
 # Create/Connect to a database 
 conn = sqlite3.connect('crm.db')
-
 # Create Cursor Instance 
 c = conn.cursor()
 
-# Tables
-
 # Create Table Base (Pivot)
 c.execute("""CREATE TABLE IF NOT EXISTS base(
-    id_k integer,
+    id integer,
     vorname text, 
     nachname text, 
     alt integer,
     strasse text,
     h_nummer integer, 
     stadt text,
-    plz text
-    )""")
-
-# Create Table Kinder
-c.execute("""CREATE TABLE IF NOT EXISTS kinder ( 
-    id_k integer PRIMARY KEY,
-    vorname text, 
-    nachname text, 
-    alt integer,
-    geschlecht text, 
-    strasse text,
-    h_nummer integer, 
-    stadt text,
     plz text,
-    kontaktperson text,
-    gruppe_id integer,
-    person_id integer,  
-    FOREIGN KEY(gruppe_id) 
-        REFERENCES gruppe (id_g),
-    FOREIGN KEY(person_id) 
-        REFERENCES person_k (id_p)
+    person text
     )""")
+   
+# Add Dummy Data
+"""
+for record in data:
+    c.execute("INSERT INTO base VALUES(:id, :vorname, :nachname, :alter, :strasse, :hausnummer, :stadt, :plz, :person)",
+       {
+        "id": record[0],
+        "vorname": record[1],
+        "nachname": record[2],
+        "alter": record[3],
+        "strasse": record[4],
+        "hausnummer": record[5],
+        "stadt": record[6],
+        "plz": record[7],
+        "person": record[8]
 
-# Create Table gruppe
-c.execute("""CREATE TABLE IF NOT EXISTS gruppe (
-    id_g integer PRIMARY KEY,
-    gruppenname text,
-    kinder_id integer,
-    erzieher_id integer,   
-    FOREIGN KEY(kinder_id) 
-        REFERENCES person_k (id_k),
-    FOREIGN KEY(erzieher_id) 
-        REFERENCES person_k (id_e)
-    )""")
-
-# Create Table person_k
-c.execute("""CREATE TABLE IF NOT EXISTS person_k (
-    id_p integer PRIMARY KEY,
-    vornname text, 
-    nachname text, 
-    alt integer,
-    strasse text,
-    h_nummer integer, 
-    stadt text,
-    plz text,
-    verwandschaft text,
-    kinder_id integer,
-    FOREIGN KEY(kinder_id) 
-        REFERENCES person_k (id_k)
-    )""")
-
-# Create Table erzieher
-c.execute("""CREATE TABLE IF NOT EXISTS erzieher (
-    id_e integer PRIMARY KEY, 
-    vornname text, 
-    nachname text, 
-    alt integer,
-    strasse text,
-    h_nummer integer, 
-    stadt text,
-    plz text,
-    kinder_id integer,
-    gruppe_id integer,
-    FOREIGN KEY(kinder_id) 
-        REFERENCES person_k (id_k),
-    FOREIGN KEY(gruppe_id) 
-        REFERENCES gruppe (id_g)
-    )""")
+       } 
+    )
+"""
 
 # Commit Changes
 conn.commit()
@@ -153,28 +104,27 @@ conn.close()
 
 # Query DB
 def query_database():
-
     # Create/Connect to a database 
     conn = sqlite3.connect('crm.db')
-
     # Create Cursor Instance 
     c = conn.cursor()
 
-    c.execute("SELECT * FROM base")
+    c.execute("SELECT rowid, * FROM base")
     records = c.fetchall()
+    #print(records) # Controll Table
 
     # Add Data to the Screen
     global count
     count = 0
 
     for record in records:
-        print(record)
+        print(record) # Controll Records
 
     for record in records:
         if count % 2 == 0:
-            my_tree.insert(parent='', index='end', iid=count, text="", values=(record[0], record[1], record[2], record[3], record[4], record[5], record[6]), tags=('evenrow', ))
+            my_tree.insert(parent='', index='end', iid=count, text="", values=(record[0], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9] ), tags=('evenrow', ))
         else:
-            my_tree.insert(parent='', index='end', iid=count, text="", values=(record[0], record[1], record[2], record[3], record[4], record[5], record[6]), tags=('oddrow', ))
+            my_tree.insert(parent='', index='end', iid=count, text="", values=(record[0], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]), tags=('oddrow', ))
         # increment counter
         count += 1
     
@@ -202,7 +152,7 @@ style.configure("Treeview",
     )
 
 # Change selected Color
-style.map("Treview",
+style.map("Treeview",
     background=[('selected', 'blue')]
     )
 
@@ -222,7 +172,7 @@ my_tree.pack()
 tree_scroll.config(command=my_tree.yview)
 
 # Define Columns Table
-my_tree['columns'] = ("1", "2", "3", "4", "5", "6", "7")
+my_tree['columns'] = ("1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 # Formate Columns Table
 my_tree.column("#0", width=0, stretch=NO) #Ghost
@@ -234,17 +184,21 @@ my_tree.column("4", anchor=CENTER, width=140, stretch=NO)
 my_tree.column("5", anchor=CENTER, width=140, stretch=NO)
 my_tree.column("6", anchor=CENTER, width=140, stretch=NO)
 my_tree.column("7", anchor=CENTER, width=140, stretch=NO)
+my_tree.column("8", anchor=CENTER, width=140, stretch=NO)
+my_tree.column("9", anchor=CENTER, width=140, stretch=NO)
 
 # Create Heading
 my_tree.heading("#0", text="", anchor=W) #Ghost
 
 my_tree.heading("1", text="ID", anchor=CENTER)
-my_tree.heading("2",text="Name",anchor=CENTER)
+my_tree.heading("2",text="Vorname",anchor=CENTER)
 my_tree.heading("3",text="Nachname",anchor=CENTER)
-my_tree.heading("4",text="Addresse", anchor=CENTER)
-my_tree.heading("5",text="Stadt",anchor=CENTER)
-my_tree.heading("6",text="PLZ", anchor=CENTER)
-my_tree.heading("7",text="Person", anchor=CENTER)
+my_tree.heading("4",text="Alter",anchor=CENTER)
+my_tree.heading("5",text="Strasse", anchor=CENTER)
+my_tree.heading("6",text="Hausnummer",anchor=CENTER)
+my_tree.heading("7",text="Stadt",anchor=CENTER)
+my_tree.heading("8",text="PLZ", anchor=CENTER)
+my_tree.heading("9",text="Person", anchor=CENTER)
 
 ########################## Label/Entries GUI SetUp #################################
 
@@ -257,38 +211,46 @@ id_l.grid(row=0, column=0, padx=10, pady=10)
 id_entry = Entry(data_frame)
 id_entry.grid(row=0, column=1, padx=10, pady=10) 
 
-rolle_l = Label(data_frame, text="Rolle")
-rolle_l.grid(row=0, column=2, padx=10, pady=10)
-rolle_entry = Entry(data_frame)
-rolle_entry.grid(row=0, column=3, padx=10, pady=10)
-
-name_l = Label(data_frame, text="Name")
-name_l.grid(row=1, column=0, padx=10, pady=10)
-name_entry = Entry(data_frame)
-name_entry.grid(row=1, column=1, padx=10, pady=10)
+vorname_l = Label(data_frame, text="Vorname")
+vorname_l.grid(row=1, column=0, padx=10, pady=10)
+vorname_entry = Entry(data_frame)
+vorname_entry.grid(row=1, column=1, padx=10, pady=10)
 
 nachname_l = Label(data_frame, text="Nachname")
 nachname_l.grid(row=1, column=2, padx=10, pady=10)
 nachname_entry = Entry(data_frame)
 nachname_entry.grid(row=1, column=3, padx=10, pady=10)
 
-addresse_l = Label(data_frame, text="Addresse")
-addresse_l.grid(row=1, column=4, padx=10, pady=10)
-addresse_entry = Entry(data_frame)
-addresse_entry.grid(row=1, column=5, padx=10, pady=10)
+alter_l = Label(data_frame, text="Alter")
+alter_l.grid(row=1, column=4, padx=10, pady=10)
+alter_entry = Entry(data_frame)
+alter_entry.grid(row=1, column=5, padx=10, pady=10)
+
+strasse_l = Label(data_frame, text="Strasse")
+strasse_l.grid(row=1, column=6, padx=10, pady=10)
+strasse_entry = Entry(data_frame)
+strasse_entry.grid(row=1, column=7, padx=10, pady=10)
+
+hausnummer_l = Label(data_frame, text="Hausnummer")
+hausnummer_l.grid(row=1, column=8, padx=10, pady=10)
+hausnummer_entry = Entry(data_frame)
+hausnummer_entry.grid(row=1, column=9, padx=10, pady=10)
 
 stadt_l = Label(data_frame, text="Stadt")
-stadt_l.grid(row=1, column=8, padx=10, pady=10)
+stadt_l.grid(row=1, column=10, padx=10, pady=10)
 stadt_entry = Entry(data_frame)
-stadt_entry.grid(row=1, column=9, padx=10, pady=10)
+stadt_entry.grid(row=1, column=11, padx=10, pady=10)
 
 plz_l = Label(data_frame, text="PLZ")
-plz_l.grid(row=1, column=10, padx=10, pady=10)
+plz_l.grid(row=1, column=12, padx=10, pady=10)
 plz_entry = Entry(data_frame)
-plz_entry.grid(row=1, column=11, padx=10, pady=10)
+plz_entry.grid(row=1, column=13, padx=10, pady=10)
 
-######### Label QueryCommands ###########
-# Here implement functions to filter search
+person_l = Label(data_frame, text="Person")
+person_l.grid(row=1, column=14, padx=10, pady=10)
+person_entry = Entry(data_frame)
+person_entry.grid(row=1, column=15, padx=10, pady=10)
+
 
 ######### Button Commands ###########
 
@@ -297,16 +259,85 @@ def remove_one():
     x = my_tree.selection()
     my_tree.delete(x)
 
+    # Create/Connect to a database 
+    conn = sqlite3.connect('crm.db')
+    # Create Cursor Instance 
+    c = conn.cursor()
+    
+    # Delete from DB
+    c.execute("DELETE from base where oid=" + id_entry.get())
+
+    # Commit Changes
+    conn.commit()
+
+    # Close Connection
+    conn.close()
+
+    # Clear entry Boxes
+    clear_entries()
+
+    # Message Box
+    messagebox.showinfo("Record Deleted!", "The selected Record has been Deleted")
+
 # Remove Many Selected Records
 def remove_many():
-    x = my_tree.selection()
-    for record in x:
-        my_tree.delete(record)
+    # Message Boxe Are you shure to delete
+    response = messagebox.askyesno("Hey YOU!", "Are you shure you wanna delete the selected Records from the Table?")
+    # Add Logic for messagebox
+    if response == 1:
+        # Designate Selections
+        x = my_tree.selection()
+        
+        # Create list of Ids
+        ids_to_delete = []
+        
+        #add Selections to ids_to_delete List
+        for record in x:
+            ids_to_delete.append(my_tree.item(record, 'values')[0])
+        # Delete from Treeview
+        for record in x:
+            my_tree.delete(record)
+
+        # Create/Connect to a database 
+        conn = sqlite3.connect('crm.db')
+        # Create Cursor Instance 
+        c = conn.cursor()
+
+        # Delete Everything from the table
+        c.executemany("DELETE FROM base WHERE oid = ?",[(a,) for a in ids_to_delete])
+
+        # Close Connection
+        conn.close()
+
+        # Clear entry Boxes
+        clear_entries()
 
 # Remove Many Selected Records
 def remove_all():
-    for record in my_tree.get_children():
-        my_tree.delete(record)
+    # Message Boxe Are you shure to delete
+    response = messagebox.askyesno("Hey!", "Are you shure you wanna delete all Records from the Table???!!!")
+    # Add Logic for messagebox
+    if response == 1:
+
+        for record in my_tree.get_children():
+            my_tree.delete(record)
+
+        # Create/Connect to a database 
+        conn = sqlite3.connect('crm.db')
+        # Create Cursor Instance 
+        c = conn.cursor()
+
+        # Delete Everything from the table
+        c.execute("DROP TABLE base")
+
+        # Close Connection
+        conn.close()
+
+        # Clear entry Boxes
+        clear_entries()
+
+        # Recreate Table
+        create_table_base_again()
 
 # Move Up
 def up():
@@ -323,23 +354,27 @@ def down():
 # Clear Entries
 def clear_entries():
     id_entry.delete(0, END)
-    rolle_entry.delete(0, END)
-    name_entry.delete(0, END)
+    vorname_entry.delete(0, END)
     nachname_entry.delete(0, END)
-    addresse_entry.delete(0, END)
+    alter_entry.delete(0, END)
+    strasse_entry.delete(0, END)
+    hausnummer_entry.delete(0, END)
     stadt_entry.delete(0, END)
     plz_entry.delete(0, END)
+    person_entry.delete(0, END)
 
 # Select Records
 def select_record(e):
     # Clear entry Boxes
     id_entry.delete(0, END)
-    rolle_entry.delete(0, END)
-    name_entry.delete(0, END)
+    vorname_entry.delete(0, END)
     nachname_entry.delete(0, END)
-    addresse_entry.delete(0, END)
+    alter_entry.delete(0, END)
+    strasse_entry.delete(0, END)
+    hausnummer_entry.delete(0, END)
     stadt_entry.delete(0, END)
     plz_entry.delete(0, END)
+    person_entry.delete(0, END)
 
     # Grab Record Number
     selected = my_tree.focus()
@@ -348,30 +383,141 @@ def select_record(e):
 
     # Output Entry Boxes
     id_entry.insert(0, values[0])
-    rolle_entry.insert(0, values[1])
-    name_entry.insert(0, values[2])
-    nachname_entry.insert(0, values[3])
-    addresse_entry.insert(0, values[4])
-    stadt_entry.insert(0, values[5])
-    plz_entry.insert(0, values[6])
+    vorname_entry.insert(0, values[1])
+    nachname_entry.insert(0, values[2])
+    alter_entry.insert(0, values[3])
+    strasse_entry.insert(0, values[4])
+    hausnummer_entry.insert(0, values[5])
+    stadt_entry.insert(0, values[6])
+    plz_entry.insert(0, values[7])
+    person_entry.insert(0, values[8])
 
 # Update Record
 def update_record():
     # Grab the Record Number
     selected = my_tree.focus()
     # Update Record
-    my_tree.item(selected, text="", values= (id_entry.get(), rolle_entry.get(), name_entry.get(), nachname_entry.get(), addresse_entry.get(), stadt_entry.get(), plz_entry.get(),))
+    my_tree.item(selected, text="", values= (id_entry.get(), vorname_entry.get(), nachname_entry.get(), alter_entry.get(), strasse_entry.get(), hausnummer_entry.get(), stadt_entry.get(), plz_entry.get(), person_entry.get()))
 
-    # DB Connection
+    # Update the DB
+
+    # Create/Connect to a database 
+    conn = sqlite3.connect('crm.db')
+    # Create Cursor Instance 
+    c = conn.cursor()
+
+    c.execute("""UPDATE base SET
+        
+        vorname = :vorname,
+        nachname = :nachname,
+        alt = :alter,
+        strasse = :strasse,
+        h_nummer =  :hausnummer,
+        stadt = :stadt,
+        plz = :plz,
+        person = :person
+
+        WHERE oid = :oid""",
+        {
+            'vorname' : vorname_entry.get(),
+            'nachname' : nachname_entry.get(), 
+            'alter' : alter_entry.get(), 
+            'strasse' : strasse_entry.get(), 
+            'hausnummer' : hausnummer_entry.get(),
+            'stadt' : stadt_entry.get(), 
+            'plz' : plz_entry.get(), 
+            'person' : person_entry.get(),
+            'oid': id_entry.get(),    
+        })
+
+    # Commit Changes
+    conn.commit()
+
+    # Close Connection
+    conn.close()
 
     # Clear entry Boxes
     id_entry.delete(0, END)
-    rolle_entry.delete(0, END)
-    name_entry.delete(0, END)
+    vorname_entry.delete(0, END)
     nachname_entry.delete(0, END)
-    addresse_entry.delete(0, END)
+    alter_entry.delete(0, END)
+    strasse_entry.delete(0, END)
+    hausnummer_entry.delete(0, END)
     stadt_entry.delete(0, END)
     plz_entry.delete(0, END)
+    person_entry.delete(0, END)
+
+# add new record to DB
+def add_record():
+    # Create/Connect to a database 
+    conn = sqlite3.connect('crm.db')
+    # Create Cursor Instance 
+    c = conn.cursor()
+
+    c.execute("INSERT INTO base Values (:id, :vorname, :nachname, :alter, :strasse, :hausnummer, :stadt, :plz, :person)",
+        {
+            'id': id_entry.get(), 
+            'vorname' : vorname_entry.get(),
+            'nachname' : nachname_entry.get(), 
+            'alter' : alter_entry.get(), 
+            'strasse' : strasse_entry.get(), 
+            'hausnummer' : hausnummer_entry.get(),
+            'stadt' : stadt_entry.get(), 
+            'plz' : plz_entry.get(), 
+            'person' : person_entry.get(),
+                
+        }
+    )
+    
+    # Commit Changes
+    conn.commit()
+
+    # Close Connection
+    conn.close()
+
+    # Clear entry Boxes
+    id_entry.delete(0, END)
+    vorname_entry.delete(0, END)
+    nachname_entry.delete(0, END)
+    alter_entry.delete(0, END)
+    strasse_entry.delete(0, END)
+    hausnummer_entry.delete(0, END)
+    stadt_entry.delete(0, END)
+    plz_entry.delete(0, END)
+    person_entry.delete(0, END)
+
+    # Clear the GUI Table
+    my_tree.delete(*my_tree.get_children())
+
+    # Run to pull data from DB on start
+    query_database()
+
+# Create Table Base again
+def create_table_base_again():
+    # Create/Connect to a database 
+    conn = sqlite3.connect('crm.db')
+    # Create Cursor Instance 
+    c = conn.cursor()
+
+    # Create Table Base (Pivot)
+    c.execute("""CREATE TABLE IF NOT EXISTS base(
+        id integer,
+        vorname text, 
+        nachname text, 
+        alt integer,
+        strasse text,
+        h_nummer integer, 
+        stadt text,
+        plz text,
+        person text
+        )""")
+
+    # Commit Changes
+    conn.commit()
+
+    # Close Connection
+    conn.close()
+    
 
 ############## Buttons ####################
 
@@ -382,26 +528,26 @@ button_frame.pack(fill="x", expand="yes", padx=20)
 update_button = Button(button_frame, text="Update Record", command=update_record)
 update_button.grid(row=0, column=0, padx=10, pady=10)
 
-add_button = Button(button_frame, text="Add Record")
-add_button.grid(row=0, column=1, padx=10, pady=10)
+add_button = Button(button_frame, text="Add Record", command=add_record)
+add_button.grid(row=0, column=3, padx=10, pady=10)
 
 remove_all_button = Button(button_frame, text="Remove All Records", command=remove_all)
-remove_all_button.grid(row=0, column=2, padx=10, pady=10)
+remove_all_button.grid(row=0, column=5, padx=10, pady=10)
 
 remove_one_button = Button(button_frame, text="Remove One Selected", command=remove_one)
-remove_one_button.grid(row=0, column=3, padx=10, pady=10)
+remove_one_button.grid(row=0, column=7, padx=10, pady=10)
 
 remove_many_button = Button(button_frame, text="Remove Many Selected", command=remove_many)
-remove_many_button.grid(row=0, column=4, padx=10, pady=10)
+remove_many_button.grid(row=0, column=9, padx=10, pady=10)
 
 move_up_button = Button(button_frame, text="Move Up", command=up)
-move_up_button.grid(row=0, column=5, padx=10, pady=10)
+move_up_button.grid(row=0, column=11, padx=10, pady=10)
 
 move_down_button = Button(button_frame, text="Move Down", command=down)
-move_down_button.grid(row=0, column=6, padx=10, pady=10)
+move_down_button.grid(row=0, column=13, padx=10, pady=10)
 
 select_record_button = Button(button_frame, text="Clear Boxes", command= clear_entries)
-select_record_button.grid(row=0, column=7, padx=10, pady=10)
+select_record_button.grid(row=0, column=15, padx=10, pady=10)
 
 ########################## Events Bindings ################################
 
